@@ -33,6 +33,12 @@ const router = Router()
     jwtValidator,
     // zodValidator(paramsSchema),
     controllers.deleteById
+  )
+  .put(
+    "/:id/cancel",
+    jwtValidator,
+    // zodValidator(paramsSchema),
+    controllers.cancelOrder
   );
 
 export default router;

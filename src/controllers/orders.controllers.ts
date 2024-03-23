@@ -4,7 +4,7 @@ import { OrdersSchemasType } from "@/schemas/orders.schemas";
 import servicesBooks from "@/services/books.services";
 import services from "@/services/orders.services";
 import servicesUsers from "@/services/users.services";
-import { PaginationType, QueryParamsType } from "@/types/app";
+import { CustomErrorType, PaginationType, QueryParamsType } from "@/types/app";
 import { customError } from "@/utils/general.utils";
 import responseHelper from "@/utils/response.utils";
 
@@ -38,7 +38,7 @@ const controllers = {
         result,
         200,
         "Success get data" as string,
-        pagination as PaginationType,
+        pagination as PaginationType
       );
     } catch (error) {
       return customError(error, res);
@@ -61,8 +61,15 @@ const controllers = {
     try {
       const { userId, bookId, quantity }: OrdersSchemasType = req.body;
 
-      await servicesUsers.getByIdCount(userId);
+      const checkUser = await servicesUsers.getById(userId);
+
       const checkBook = await servicesBooks.getById(bookId);
+
+      if (checkUser?.point || 0 < checkBook.price * quantity) {
+        const error: CustomErrorType = new Error("Point is not enough");
+        error.statusCode = 400;
+        throw error;
+      }
 
       await services.create({
         paymentLink: "",
@@ -97,7 +104,7 @@ const controllers = {
         await servicesUsers.getByIdCount(userId);
       }
       const checkBook = await servicesBooks.getById(
-        bookId || checkOrders.bookId,
+        bookId || checkOrders.bookId
       );
 
       await services.updateById(id, {
@@ -123,6 +130,20 @@ const controllers = {
       await services.deleteById(id);
 
       return responseHelper(res, null, 200, "Success deleted");
+    } catch (error) {
+      return customError(error, res);
+    }
+  },
+
+  cancelOrder: async (req: Request, res: Response) => {
+    try {
+      const id = Number(req.params.id);
+
+      await services.getByIdCount(id);
+
+      await services.cancelOrder(id);
+
+      return responseHelper(res, null, 200, "Success canceled");
     } catch (error) {
       return customError(error, res);
     }

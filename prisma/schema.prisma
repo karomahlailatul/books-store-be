@@ -29,6 +29,8 @@ model users {
     role     role    @default(USER)
     status   Boolean @default(true)
 
+    point Int? @default(0)
+
     createdAt DateTime  @default(now()) @db.Timestamp(0)
     updatedAt DateTime  @default(now()) @db.Timestamp(0)
     sellers   sellers[]

@@ -148,6 +148,7 @@ const services = {
       data: {
         ...data,
         password: hashedPassword,
+        point: 100, // default point after register
       },
     });
 

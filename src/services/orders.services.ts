@@ -61,7 +61,7 @@ const services = {
         id,
       },
       // include: {
-         
+
       //   seller: true,
       // },
     });
@@ -131,6 +131,25 @@ const services = {
 
     if (!result) {
       const error: CustomErrorType = new Error("Failed deleted");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    return result;
+  },
+
+  cancelOrder: async (id: number) => {
+    const result = await prisma.orders.update({
+      where: {
+        id,
+      },
+      data: {
+        statusOrder: "CANCEL",
+      },
+    });
+
+    if (!result) {
+      const error: CustomErrorType = new Error("Failed updated");
       error.statusCode = 400;
       throw error;
     }
