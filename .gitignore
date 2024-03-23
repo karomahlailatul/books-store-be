@@ -4,7 +4,7 @@ node_modules
 .env.staging
 .env.prod
 
-dist
+# dist
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
