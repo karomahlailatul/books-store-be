@@ -1,0 +1,98 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+enum role {
+    ADMIN
+    USER
+}
+
+enum statusOrder {
+    PENDING
+    SUCCESS
+    CANCEL
+}
+
+model users {
+    id       Int     @id @default(autoincrement())
+    username String  @db.VarChar(255)
+    email    String  @unique(map: "email") @db.VarChar(255)
+    password String? @db.VarChar(255)
+    role     role    @default(USER)
+    status   Boolean @default(true)
+
+    createdAt DateTime  @default(now()) @db.Timestamp(0)
+    updatedAt DateTime  @default(now()) @db.Timestamp(0)
+    sellers   sellers[]
+    orders    orders[]
+}
+
+model sellers {
+    id   Int    @id @default(autoincrement())
+    name String @db.VarChar(255)
+
+    userId Int
+    user   users @relation(fields: [userId], references: [id])
+
+    status Boolean @default(true)
+
+    createdAt DateTime @default(now()) @db.Timestamp(0)
+    updatedAt DateTime @default(now()) @db.Timestamp(0)
+
+    books books[]
+}
+
+model books {
+    id          Int     @id @default(autoincrement())
+    title       String  @db.VarChar(255)
+    description String  @db.Text
+    author      String  @db.VarChar(255)
+    image       String  @db.VarChar(255)
+    price       Float
+    status      Boolean @default(true)
+
+    sellerId Int
+    seller   sellers @relation(fields: [sellerId], references: [id])
+
+    createdAt DateTime @default(now()) @db.Timestamp(0)
+    updatedAt DateTime @default(now()) @db.Timestamp(0)
+
+    orders     orders[]
+    categories bookCategories[]
+}
+
+model bookCategories {
+    id   Int    @id @default(autoincrement())
+    name String @db.VarChar(255)
+
+    createdAt DateTime @default(now()) @db.Timestamp(0)
+    updatedAt DateTime @default(now()) @db.Timestamp(0)
+
+    books books[]
+}
+
+model orders {
+    id     Int   @id @default(autoincrement())
+    userId Int
+    user   users @relation(fields: [userId], references: [id])
+
+    bookId Int
+    book   books @relation(fields: [bookId], references: [id])
+
+    quantity    Int
+    total       Float
+    statusOrder statusOrder @default(PENDING)
+
+    paymentLink String @db.VarChar(255)
+
+    createdAt DateTime @default(now()) @db.Timestamp(0)
+    updatedAt DateTime @default(now()) @db.Timestamp(0)
+}
