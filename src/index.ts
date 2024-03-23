@@ -1,4 +1,4 @@
-// import cors from "cors";
+import cors from "cors";
 import { config } from "dotenv";
 import express, { Request, Response } from "express";
 import helmet from "helmet";
@@ -9,11 +9,7 @@ config();
 
 const app = express();
 
-// app.use(
-//   cors({
-//     origin: "*",
-//   })
-// );
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
